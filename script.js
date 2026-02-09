@@ -1,13 +1,24 @@
-function updateDefaultConc() {
+function handleModeChange() {
   const mode = document.getElementById('mode').value;
+  const customGroup = document.getElementById('custom-conc-group');
   const concInput = document.getElementById('concentration');
-  
-  if (mode === 'anesthesia') {
-    concInput.value = 50;
-  } else if (mode === 'euthanasia') {
-    concInput.value = 250;
+
+  if (mode === 'custom') {
+    customGroup.classList.remove('hidden');
+    concInput.required = true;
+    concInput.value = ''; // clear any previous default
+  } else {
+    customGroup.classList.add('hidden');
+    concInput.required = false;
+    
+    if (mode === 'anesthesia') {
+      concInput.value = 50;
+    } else if (mode === 'euthanasia') {
+      concInput.value = 250;
+    }
   }
-  // If user has already typed a custom value, we don't overwrite it
+
+  updateVolumeLabel(); // just in case
 }
 
 function updateVolumeLabel() {
@@ -26,17 +37,17 @@ function calculate() {
   resultDiv.innerHTML = '';
 
   if (!mode) {
-    resultDiv.innerHTML = '<p style="color: #e74c3c;">Select Anesthesia or Euthanasia.</p>';
+    resultDiv.innerHTML = '<p style="color: #e74c3c;">Please select a purpose.</p>';
     return;
   }
 
   if (isNaN(concentration) || concentration <= 0) {
-    resultDiv.innerHTML = '<p style="color: #e74c3c;">Enter a valid concentration > 0 mg/L.</p>';
+    resultDiv.innerHTML = '<p style="color: #e74c3c;">Enter a valid concentration greater than 0 mg/L.</p>';
     return;
   }
 
   if (isNaN(volumeInput) || volumeInput <= 0) {
-    resultDiv.innerHTML = '<p style="color: #e74c3c;">Enter a valid volume > 0.</p>';
+    resultDiv.innerHTML = '<p style="color: #e74c3c;">Enter a valid volume greater than 0.</p>';
     return;
   }
 
@@ -46,11 +57,17 @@ function calculate() {
   const totalMg = concentration * volumeLiters;
   const totalGrams = (totalMg / 1000).toFixed(2);
 
-  const unitDisplay = unit === 'bushels' ? `${volumeInput} bushel${volumeInput !== 1 ? 's' : ''} (${volumeLiters.toFixed(1)} L)` : `${volumeInput} L`;
+  const unitDisplay = unit === 'bushels' 
+    ? `${volumeInput} bushel${volumeInput !== 1 ? 's' : ''} (${volumeLiters.toFixed(1)} L)` 
+    : `${volumeInput} L`;
+
+  let purposeText = mode === 'custom' 
+    ? 'Custom' 
+    : mode.charAt(0).toUpperCase() + mode.slice(1);
 
   resultDiv.innerHTML = `
     <p>For <strong>${unitDisplay}</strong>:</p>
-    <p><strong>${mode.charAt(0).toUpperCase() + mode.slice(1)} dose (${concentration} mg/L):</strong></p>
+    <p><strong>${purposeText} dose (${concentration} mg/L):</strong></p>
     <p style="font-size: 1.8rem; margin: 0.8rem 0; color: #c0392b;">
       Add <strong>${totalGrams} grams</strong> of MS-222
     </p>
@@ -59,7 +76,9 @@ function calculate() {
   `;
 }
 
-// Initialize on load
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
   updateVolumeLabel();
+  // Set initial state
+  document.getElementById('mode').value = ''; // force user to choose
 });
