@@ -21,21 +21,25 @@
 
     <form id="calc-form">
       <label for="mode">Purpose:</label>
-      <select id="mode" onchange="updateDefaultConc()" required>
-        <option value="" disabled selected>Select mode...</option>
-        <option value="anesthesia">Anesthesia (default 50 mg/L)</option>
-        <option value="euthanasia">Euthanasia (default 250 mg/L)</option>
+      <select id="mode" onchange="handleModeChange()" required>
+        <option value="" disabled selected>Select purpose...</option>
+        <option value="anesthesia">Anesthesia (50 mg/L)</option>
+        <option value="euthanasia">Euthanasia (250 mg/L)</option>
+        <option value="custom">Custom Concentration</option>
       </select>
 
-      <label>Concentration (mg/L):</label>
-      <input 
-        type="number" 
-        id="concentration" 
-        min="1" 
-        step="1" 
-        value="50" 
-        required 
-      />
+      <div id="custom-conc-group" class="hidden">
+        <label for="concentration">Concentration (mg/L):</label>
+        <input 
+          type="number" 
+          id="concentration" 
+          min="1" 
+          step="1" 
+          value="" 
+          placeholder="Enter value (e.g. 100)"
+          required 
+        />
+      </div>
 
       <label>Volume unit:</label>
       <div class="radio-group">
